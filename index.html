@@ -1,0 +1,413 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/icon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0369a1" />
+    <meta name="description" content="تطبيق ويب لمساعدة مفتشي التربية البدنية على إدارة زياراتهم وتفتيشاتهم وتقاريرهم المتعلقة بالأساتذة.">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="المفتش الذكي">
+    <title>المفتش الذكي</title>
+    
+    <!-- Fonts and Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&family=Almarai:wght@400;700&family=Inter:wght@400;500;600&family=Roboto:wght@400;500&family=Lato:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: ['class', ':is([data-theme="dark"], [data-theme="dark-midnight"])'],
+        theme: {
+          extend: {
+            colors: {
+              // Les couleurs sont gérées via les variables CSS ci-dessous
+            }
+          }
+        }
+      }
+    </script>
+
+    <!-- Custom Styles -->
+    <style>
+      :root {
+        /* Set base font size to 13px as requested */
+        font-size: 13px;
+        
+        --color-primary: 3, 105, 161; /* sky-700 */
+        --color-secondary: 107, 114, 128; /* gray-500 */
+        --color-background: 248, 250, 252; /* slate-50 */
+        --color-card: 255, 255, 255; /* white */
+        --color-text-base: 30, 41, 59; /* slate-800 */
+        --color-text-muted: 71, 85, 105; /* slate-600 */
+        --color-border: 226, 232, 240; /* slate-200 */
+        --color-card-hover: 241, 245, 249; /* slate-100 */
+        --color-button-secondary-bg: 241, 245, 249; /* slate-100 */
+        --color-button-secondary-hover-bg: 226, 232, 240; /* slate-200 */
+        --color-success-bg: 236, 253, 245; /* emerald-50 */
+        --color-success-border: 167, 243, 208; /* emerald-200 */
+        --color-success-text: 6, 95, 70; /* emerald-800 */
+        --color-error-bg: 254, 242, 242; /* rose-50 */
+        --color-error-border: 254, 205, 211; /* rose-200 */
+        --color-error-text: 159, 18, 57; /* rose-800 */
+        --border-radius: 0.75rem; /* 12px */
+      }
+
+      /* Ensure mobile font size matches desktop at 13px */
+      @media (max-width: 768px) {
+        :root {
+          font-size: 13px;
+        }
+      }
+
+      html[data-theme='light-warm'] {
+        --color-primary: 217, 119, 6; /* amber-600 */
+        --color-secondary: 120, 113, 108; /* stone-500 */
+        --color-background: 250, 246, 240; /* warm off-white */
+        --color-card: 255, 255, 255; /* white */
+        --color-text-base: 68, 64, 60; /* stone-700 */
+        --color-text-muted: 120, 113, 108; /* stone-500 */
+        --color-border: 231, 229, 228; /* stone-200 */
+        --color-card-hover: 245, 245, 244; /* stone-100 */
+        --color-button-secondary-bg: 245, 245, 244; /* stone-100 */
+        --color-button-secondary-hover-bg: 231, 229, 228; /* stone-200 */
+      }
+
+      html[data-theme='dark'] {
+        --color-primary: 59, 130, 246; /* blue-500 */
+        --color-secondary: 156, 163, 175; /* gray-400 */
+        --color-background: 15, 23, 42; /* slate-900 */
+        --color-card: 30, 41, 59; /* slate-800 */
+        --color-text-base: 248, 250, 252; /* slate-50 */
+        --color-text-muted: 148, 163, 184; /* slate-400 */
+        --color-border: 51, 65, 85; /* slate-700 */
+        --color-card-hover: 51, 65, 85; /* slate-700 */
+        --color-button-secondary-bg: 51, 65, 85; /* slate-700 */
+        --color-button-secondary-hover-bg: 71, 85, 105; /* slate-600 */
+        --color-success-bg: 6, 78, 59; /* emerald-900 */
+        --color-success-border: 5, 150, 105; /* emerald-600 */
+        --color-success-text: 110, 231, 183; /* emerald-300 */
+        --color-error-bg: 127, 29, 29; /* rose-900 */
+        --color-error-border: 225, 29, 72; /* rose-600 */
+        --color-error-text: 253, 164, 175; /* rose-300 */
+      }
+
+      html[data-theme='dark-midnight'] {
+        --color-primary: 99, 102, 241; /* indigo-500 */
+        --color-secondary: 156, 163, 175; /* gray-400 */
+        --color-background: 5, 5, 10; /* very dark blue/black */
+        --color-card: 15, 15, 25; /* slightly lighter */
+        --color-text-base: 248, 250, 252; /* slate-50 */
+        --color-text-muted: 148, 163, 184; /* slate-400 */
+        --color-border: 30, 30, 45; /* dark border */
+        --color-card-hover: 25, 25, 40; 
+        --color-button-secondary-bg: 25, 25, 40; 
+        --color-button-secondary-hover-bg: 40, 40, 60; 
+        --color-success-bg: 6, 78, 59; /* emerald-900 */
+        --color-success-border: 5, 150, 105; /* emerald-600 */
+        --color-success-text: 110, 231, 183; /* emerald-300 */
+        --color-error-bg: 127, 29, 29; /* rose-900 */
+        --color-error-border: 225, 29, 72; /* rose-600 */
+        --color-error-text: 253, 164, 175; /* rose-300 */
+      }
+
+      /* GLOBAL SCROLLBAR STYLING */
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background-color: rgb(var(--color-border));
+        border-radius: 9999px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+        transition: background-color 0.3s ease;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: rgb(var(--color-primary) / 0.7);
+      }
+
+      body {
+        font-family: 'Cairo', sans-serif;
+        background-color: rgb(var(--color-background));
+        color: rgb(var(--color-text-base));
+        scroll-behavior: smooth;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        padding-top: calc(env(safe-area-inset-top) + 15px);
+        padding-bottom: calc(env(safe-area-inset-bottom) + 15px);
+        box-sizing: border-box;
+        min-height: 100vh;
+      }
+      .app-title-font {
+        font-family: 'Arabic Typesetting', 'Cairo', sans-serif;
+        font-weight: bold;
+        font-size: 36px;
+      }
+      .input-style {
+        display: block;
+        width: 100%;
+        padding: 0.65rem 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid rgb(var(--color-border));
+        background-color: rgb(var(--color-card));
+        color: rgb(var(--color-text-base));
+        transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.3s ease, color 0.3s ease;
+      }
+      .input-style::placeholder {
+        color: rgb(var(--color-text-muted));
+      }
+      .input-style:focus {
+        outline: none;
+        border-color: rgb(var(--color-primary) / 0.5);
+        box-shadow: 0 0 0 2px rgb(var(--color-primary) / 0.2);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.65rem 1.25rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+        border: 1px solid transparent;
+      }
+      .btn-primary {
+        background-color: rgb(var(--color-primary));
+        color: white;
+      }
+      .btn-primary:hover {
+         background-color: rgb(var(--color-primary) / 0.9);
+         box-shadow: 0 4px 15px -5px rgb(var(--color-primary) / 0.5);
+      }
+      .report-preview-container-forced-style {
+          background-color: white !important;
+          color: black !important;
+          border: 1px solid #e2e8f0; 
+          overflow-x: auto;
+          font-size: 0.95rem;
+          width: 100%;
+          max-width: 100%;
+          padding: 1rem;
+      }
+      .report-preview-container-forced-style table {
+          min-width: 850px; /* Ensure table doesn't squeeze too much on mobile */
+          border-collapse: collapse;
+      }
+      @media (max-width: 768px) {
+          .report-preview-container-forced-style {
+              font-size: 0.7rem;
+              padding: 0.1rem;
+              overflow-x: auto;
+          }
+          .report-preview-container-forced-style table {
+              min-width: 100%; /* Allow table to fit container width */
+              width: 100%;
+          }
+      }
+      .report-preview-container-forced-style, .report-preview-container-forced-style * {
+          color: black !important;
+      }
+      .calendar-container {
+        aspect-ratio: 1.3;
+        min-height: 500px;
+        max-height: 80vh;
+        width: 100%;
+      }
+      /* Calendar General & Month View Enhancements */
+      .rbc-calendar {
+        font-family: 'Cairo', sans-serif;
+      }
+      .rbc-month-view {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        border: 1px solid rgb(var(--color-border));
+        background-color: rgb(var(--color-card));
+      }
+      .rbc-header {
+        padding: 10px 5px;
+        font-weight: 700;
+        background-color: rgb(var(--color-primary));
+        color: white;
+        border-bottom: 2px solid rgb(var(--color-primary) / 0.8) !important;
+      }
+      .rbc-day-bg + .rbc-day-bg {
+        border-left: 1px solid rgb(var(--color-border) / 0.5);
+      }
+      .rbc-month-row + .rbc-month-row {
+        border-top: 1px solid rgb(var(--color-border) / 0.5);
+      }
+      .rbc-today {
+        background-color: rgb(var(--color-primary) / 0.15) !important;
+        box-shadow: inset 0 0 0 2px rgb(var(--color-primary)) !important;
+      }
+      .rbc-today .rbc-date-cell {
+        font-weight: 900;
+        color: rgb(var(--color-primary));
+        text-decoration: underline;
+      }
+      .rbc-date-cell {
+        padding: 4px 8px;
+        font-weight: 600;
+      }
+      .rbc-off-range-bg {
+        background-color: rgb(var(--color-border) / 0.2);
+      }
+      .rbc-event {
+        border-radius: 4px !important;
+        padding: 2px 6px !important;
+        font-size: 0.85em !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      }
+      /* Calendar Daily View Enhancements */
+      .rbc-time-view {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        border: 1px solid rgb(var(--color-border));
+        background-color: rgb(var(--color-card));
+      }
+      .rbc-time-header {
+        background-color: rgb(var(--color-primary) / 0.05);
+        border-bottom: 2px solid rgb(var(--color-primary) / 0.2);
+      }
+      .rbc-time-header-content {
+        border-left: 1px solid rgb(var(--color-border));
+      }
+      .rbc-time-content {
+        border-top: none;
+      }
+      .rbc-timeslot-group {
+        border-bottom: 1px solid rgb(var(--color-border) / 0.5);
+        transition: background-color 0.2s;
+      }
+      .rbc-day-slot .rbc-time-slot {
+        border-top: 1px dashed rgb(var(--color-border) / 0.3);
+      }
+      .rbc-day-slot .rbc-time-slot:hover {
+        background-color: rgb(var(--color-primary) / 0.02);
+      }
+      .rbc-current-time-indicator {
+        background-color: rgb(var(--color-error-text));
+        height: 2px;
+      }
+      .rbc-current-time-indicator::before {
+        content: '';
+        position: absolute;
+        left: -4px;
+        top: -4px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: rgb(var(--color-error-text));
+      }
+      .rbc-today {
+        background-color: rgb(var(--color-primary) / 0.15) !important;
+      }
+      .rbc-agenda-view {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        border: 1px solid rgb(var(--color-border));
+      }
+      .rbc-agenda-view table.rbc-agenda-table {
+        border: none;
+      }
+      .rbc-agenda-view table.rbc-agenda-table thead > tr > th {
+        background-color: rgb(var(--color-primary) / 0.05);
+        border-bottom: 2px solid rgb(var(--color-primary) / 0.2);
+        padding: 10px;
+        color: rgb(var(--color-primary));
+      }
+      .rbc-agenda-view table.rbc-agenda-table tbody > tr > td {
+        padding: 10px;
+        border-top: 1px solid rgb(var(--color-border) / 0.5);
+      }
+      .rbc-agenda-view table.rbc-agenda-table tbody > tr:hover {
+        background-color: rgb(var(--color-primary) / 0.02);
+      }
+      @media (max-width: 640px) {
+        .calendar-container {
+          aspect-ratio: 0.8;
+          min-height: 400px;
+        }
+        .rbc-month-row {
+          min-height: 10vw !important;
+        }
+      }
+      @media print {
+        .print-hidden {
+          display: none !important;
+        }
+        .report-section-bg {
+            background-color: #FFFFFF !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        body {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes toastOut {
+        from {
+          opacity: 1;
+          transform: scale(1);
+        }
+        to {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+      }
+      .toast-container {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 2000;
+        width: auto;
+        max-width: 90%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        pointer-events: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .toast-item {
+        animation: toastIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        pointer-events: auto;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      }
+      .toast-item.fade-out {
+        animation: toastOut 0.2s ease-in forwards;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.min.js"></script>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

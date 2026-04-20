@@ -1,0 +1,117 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && request.auth.token.email == 'amineo3atmane@gmail.com';
+    }
+
+    function isAuthorized() {
+      // For this app, any verified user can list teachers, but only admins can write
+      return isSignedIn();
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isOwnerOrAdmin(userId) {
+      return isOwner(userId) || isSuperAdmin();
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128;
+    }
+
+    // --- Validation Blueprints ---
+
+    function isValidAuthorizedUser(data) {
+      return data.email is string && data.email.size() <= 200
+        && data.role in ['admin', 'user']
+        && (!('addedAt' in data) || (data.addedAt is string && data.addedAt.size() <= 100));
+    }
+
+    function isValidBackup(data) {
+      return (data.inspectorName is string && data.inspectorName.size() <= 200)
+        && (data.totalChunks is number && data.totalChunks >= 0)
+        && (data.updatedAt is string && data.updatedAt.size() <= 100)
+        && (!('geminiApiKey' in data) || (data.geminiApiKey is string && data.geminiApiKey.size() <= 1000));
+    }
+
+    function isValidChunk(data) {
+      return data.keys().hasAll(['index', 'data']) 
+        && data.keys().size() == 2
+        && data.index is number
+        && data.index >= 0
+        && data.data is string
+        && data.data.size() <= 1048576;
+    }
+
+    function isValidTeacher(data) {
+      return (data.full_name is string && data.full_name.size() <= 200)
+        && (!('employee_id' in data) || (data.employee_id is number))
+        && (!('is_deleted' in data) || (data.is_deleted is bool));
+    }
+
+    // --- Teachers Rules ---
+    match /teachers/{teacherId} {
+      allow get: if isAuthorized() && isValidId(teacherId);
+      allow list: if isAuthorized() && (resource == null || resource.data.is_deleted == false);
+      allow write: if isSuperAdmin() && isValidTeacher(incoming());
+    }
+
+    // --- Modern Backup Rules ---
+    match /backups/{userId} {
+      allow get: if isOwnerOrAdmin(userId) && isValidId(userId);
+      allow create: if isOwner(userId) && isValidId(userId) 
+        && incoming().keys().hasAll(['totalChunks', 'updatedAt', 'inspectorName'])
+        && isValidBackup(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) 
+        && isValidBackup(incoming())
+        && incoming().diff(existing()).affectedKeys().hasOnly(['totalChunks', 'updatedAt', 'inspectorName', 'geminiApiKey']);
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      match /chunks/{chunkId} {
+        allow get: if isOwnerOrAdmin(userId) && isValidId(userId) && isValidId(chunkId);
+        allow list: if isOwnerOrAdmin(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(chunkId) 
+          && isValidChunk(incoming());
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(chunkId) 
+          && isValidChunk(incoming())
+          && incoming().diff(existing()).affectedKeys().hasOnly(['data', 'index']);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(chunkId);
+      }
+    }
+
+    // --- Legacy Backup Rules ---
+    match /users_data/{inspectorName} {
+      allow get: if isSuperAdmin() && isValidId(inspectorName);
+      allow list: if false; 
+      allow write: if false; 
+    }
+
+    // --- Access Control Rules ---
+    match /authorized_users/{email} {
+      allow get: if isSignedIn() && (request.auth.token.email == email || isSuperAdmin());
+      allow list: if isSuperAdmin();
+      allow create, update, delete: if isSuperAdmin() && isValidAuthorizedUser(incoming());
+    }
+  }
+}

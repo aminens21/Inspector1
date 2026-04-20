@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0369a1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0284c7;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="120" fill="url(#grad1)"/>
+  
+  <!-- Clipboard Body -->
+  <rect x="128" y="110" width="256" height="330" rx="20" fill="white" filter="url(#shadow)"/>
+  
+  <!-- Clipboard Header/Clip -->
+  <path d="M192 90 H320 V130 A10 10 0 0 1 310 140 H202 A10 10 0 0 1 192 130 Z" fill="#e0f2fe"/>
+  <rect x="216" y="70" width="80" height="40" rx="8" fill="#0f172a"/> <!-- Metal part -->
+  <circle cx="256" cy="90" r="8" fill="#e2e8f0"/> <!-- Hole -->
+
+  <!-- Checkmark (Green for success/validation) -->
+  <path d="M180 260 L240 320 L340 200" stroke="#059669" stroke-width="35" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Text Lines (Abstract) -->
+  <rect x="170" y="370" width="172" height="16" rx="8" fill="#cbd5e1"/>
+  <rect x="170" y="405" width="120" height="16" rx="8" fill="#cbd5e1"/>
+
+</svg>

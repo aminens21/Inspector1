@@ -1,0 +1,8 @@
+{
+  "name": "Remix: Remix: المفتش الذكي",
+  "description": "تطبيق ويب لمساعدة مفتشي التربية البدنية على إدارة زياراتهم وتفتيشاتهم وتقاريرهم المتعلقة بالأساتذة.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}

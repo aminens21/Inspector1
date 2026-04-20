@@ -1,0 +1,80 @@
+{
+  "entities": {
+    "Backup": {
+      "title": "Backup",
+      "description": "User data backup metadata",
+      "type": "object",
+      "properties": {
+        "totalChunks": { "type": "number" },
+        "updatedAt": { "type": "string" },
+        "geminiApiKey": { "type": "string" },
+        "inspectorName": { "type": "string" }
+      }
+    },
+    "Chunk": {
+      "title": "Chunk",
+      "description": "A part of the serialized JSON data",
+      "type": "object",
+      "properties": {
+        "index": { "type": "number" },
+        "data": { "type": "string" }
+      },
+      "required": ["index", "data"]
+    },
+    "LegacyBackup": {
+      "title": "Legacy Backup",
+      "description": "Legacy backup data",
+      "type": "object",
+      "properties": {
+        "backupData": { "type": "string" }
+      }
+    },
+    "AuthorizedUser": {
+      "title": "Authorized User",
+      "description": "A user allowed to access the application",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] },
+        "addedAt": { "type": "string" }
+      },
+      "required": ["email", "role"]
+    },
+    "Teacher": {
+      "title": "Teacher",
+      "description": "Teacher profile",
+      "type": "object",
+      "properties": {
+        "full_name": { "type": "string" },
+        "employee_id": { "type": "number" },
+        "genre": { "type": "string", "enum": ["male", "female"] },
+        "framework": { "type": "string" },
+        "institution": { "type": "string" },
+        "subject": { "type": "string" },
+        "is_deleted": { "type": "boolean" }
+      }
+    }
+  },
+  "firestore": {
+    "/authorized_users/{email}": {
+      "schema": "AuthorizedUser",
+      "description": "List of emails allowed to access the app"
+    },
+    "/backups/{userId}": {
+      "schema": "Backup",
+      "description": "Backup metadata per user"
+    },
+    "/backups/{userId}/chunks/{chunkId}": {
+      "schema": "Chunk",
+      "description": "Data chunks for user backup"
+    },
+    "/teachers/{teacherId}": {
+      "schema": "Teacher",
+      "description": "Shared teachers directory"
+    },
+    "/users_data/{inspectorName}": {
+      "schema": "LegacyBackup",
+      "description": "Legacy unsplit json backups"
+    }
+  }
+}

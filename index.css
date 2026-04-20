@@ -1,0 +1,4 @@
+/* 
+  Styles are now loaded in index.html to ensure compatibility with no-build environments.
+  This file is kept empty to avoid errors with existing imports.
+*/

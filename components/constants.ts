@@ -1,0 +1,2 @@
+export const ministryLogoBase64 = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Logo_du_minist%C3%A8re_de_l%27%C3%A9ducation_nationale_%28Maroc%29.png/1200px-Logo_du_minist%C3%A8re_de_l%27%C3%A9ducation_nationale_%28Maroc%29.png";
+export const ministryLogoBase64Fr = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Logo_du_minist%C3%A8re_de_l%27%C3%A9ducation_nationale_%28Maroc%29.png/1200px-Logo_du_minist%C3%A8re_de_l%27%C3%A9ducation_nationale_%28Maroc%29.png";
