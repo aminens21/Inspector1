@@ -12,7 +12,7 @@ service cloud.firestore {
     }
 
     function isSuperAdmin() {
-      return isSignedIn() && request.auth.token.email == 'amineo3atmane@gmail.com';
+      return isSignedIn() && request.auth.token.email == 'aminens21@gmail.com';
     }
 
     function isAuthorized() {
@@ -75,6 +75,15 @@ service cloud.firestore {
       allow get: if isAuthorized() && isValidId(teacherId);
       allow list: if isAuthorized() && (resource == null || resource.data.is_deleted == false);
       allow write: if isSuperAdmin() && isValidTeacher(incoming());
+    }
+
+    // --- External Platform Collections ---
+    match /teacher_details/{id} {
+      allow read: if isAuthorized();
+    }
+
+    match /timetable_sessions/{id} {
+      allow read: if isAuthorized();
     }
 
     // --- Modern Backup Rules ---

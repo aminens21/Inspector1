@@ -114,19 +114,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onGoogleLogin, ministr
                     <span className="text-lg">{t('login_with_google')}</span>
                 </button>
 
-                <button
-                    type="button"
-                    onClick={() => {
-                        // Secret way to enter without Google during preview
-                        localStorage.setItem('isLoggedIn', 'true');
-                        window.location.reload();
-                    }}
-                    className="w-full flex items-center justify-center gap-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium py-3 rounded-xl transition-all border border-slate-200 dark:border-slate-700"
-                >
-                    <i className="fas fa-user-clock"></i>
-                    <span>{language === 'ar' ? 'الدخول كضيف (بدون مزامنة)' : 'Accès Invité (Sans Sync)'}</span>
-                </button>
-
                 <p className="text-center text-xs text-[rgb(var(--color-text-muted))] px-4 leading-relaxed">
                     {t('login_firstTimeNote')}
                 </p>

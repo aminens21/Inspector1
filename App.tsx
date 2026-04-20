@@ -175,22 +175,39 @@ const App: React.FC = () => {
         }
     };
 
-    const isSuperAdmin = auth.currentUser?.email === 'amineo3atmane@gmail.com';
+    const isSuperAdmin = auth.currentUser?.email === 'aminens21@gmail.com';
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                setStorageUser(user.uid);
-                reloadDataFromStorage();
-                setIsAuthenticated(true);
+                // Verify authorization on reload too
+                const superAdminEmail = 'aminens21@gmail.com';
+                const isMainAdmin = user.email === superAdminEmail;
+                let authorized = isMainAdmin;
+
+                if (!isMainAdmin && user.email) {
+                    const userDoc = await getDoc(doc(db, 'authorized_users', user.email.toLowerCase()));
+                    if (userDoc.exists()) {
+                        authorized = true;
+                    }
+                }
+
+                if (authorized) {
+                    setStorageUser(user.uid);
+                    reloadDataFromStorage();
+                    setIsAuthenticated(true);
+                } else {
+                    await signOut(auth);
+                    setStorageUser(null);
+                    setIsAuthenticated(false);
+                    localStorage.removeItem('isLoggedIn');
+                }
                 setIsAuthLoading(false);
             } else {
                 setStorageUser(null);
                 reloadDataFromStorage();
-                
-                // Only set authenticated to false if there's no manual login flag
-                const isGuest = localStorage.getItem('isLoggedIn') === 'true';
-                setIsAuthenticated(isGuest);
+                setIsAuthenticated(false);
+                localStorage.removeItem('isLoggedIn');
                 setIsAuthLoading(false);
             }
         });
@@ -205,8 +222,35 @@ const App: React.FC = () => {
         setIsProcessing(true);
         try {
             const provider = new GoogleAuthProvider();
-            await signInWithPopup(auth, provider);
-            addToast(t('login_success') || 'تم تسجيل الدخول بنجاح', 'success');
+            const result = await signInWithPopup(auth, provider);
+            const user = result.user;
+
+            if (user && user.email) {
+                // Check if user is the main admin or authorized
+                const superAdminEmail = 'aminens21@gmail.com';
+                const isMainAdmin = user.email === superAdminEmail;
+                
+                let isAuthorized = isMainAdmin;
+
+                if (!isMainAdmin) {
+                    // Check Firestore authorized_users collection
+                    const userDoc = await getDoc(doc(db, 'authorized_users', user.email.toLowerCase()));
+                    if (userDoc.exists()) {
+                        isAuthorized = true;
+                    }
+                }
+
+                if (!isAuthorized) {
+                    await signOut(auth);
+                    setIsAuthenticated(false);
+                    localStorage.removeItem('isLoggedIn');
+                    addToast(language === 'ar' ? 'عذراً، هذا الحساب غير مفوض للولوج.' : 'Désolé, ce compte n\'est pas autorisé.', 'error');
+                    return;
+                }
+
+                addToast(t('login_success') || 'تم تسجيل الدخول بنجاح', 'success');
+                localStorage.setItem('isLoggedIn', 'true');
+            }
         } catch (error: any) {
             console.error("Google login error:", error);
             addToast(`خطأ في تسجيل الدخول: ${error.message}`, 'error');
@@ -883,13 +927,17 @@ const App: React.FC = () => {
             loadingToastId = addToast('جاري مزامنة الأساتذة من المنصة... يرجى الانتظار', 'info', false);
         }
         try {
-            const teachersRef = collection(db, 'teachers');
-            const q = query(teachersRef, where('is_deleted', '==', false));
-            const querySnapshot = await getDocs(q);
+            // Updated to 'teacher_details' based on the user's database structure
+            const teachersRef = collection(db, 'teacher_details');
+            const querySnapshot = await getDocs(teachersRef);
             
             const data: any[] = [];
             querySnapshot.forEach((docSnap) => {
-                data.push({ id: docSnap.id, ...docSnap.data() });
+                const docData = docSnap.data();
+                // Filter out deleted teachers in memory
+                if (docData.is_deleted !== true) {
+                    data.push({ id: docSnap.id, ...docData });
+                }
             });
 
             if (data && data.length > 0) {
@@ -899,7 +947,7 @@ const App: React.FC = () => {
 
                 data.forEach((t: any) => {
                     const mappedTeacher: Teacher = {
-                        id: t.id,
+                        id: t.id || t.employee_id || t.full_name || String(Math.random()),
                         fullName: t.full_name || '',
                         employeeId: t.employee_id || 0,
                         genre: t.genre || 'male',
